@@ -1,0 +1,53 @@
+<section class="task-page">
+  <header class="task-header">
+    <h1>Task Manager</h1>
+    <p>Plan, track, and complete your work.</p>
+  </header>
+
+  <form [formGroup]="taskForm" (ngSubmit)="createTask()" class="task-form">
+    <label for="title">Task title</label>
+    <input id="title" type="text" formControlName="title" placeholder="Add a meaningful task" />
+    @if (titleControl.touched && titleControl.invalid) {
+      <small class="field-error">Title is required and must be 120 characters max.</small>
+    }
+
+    <label for="description">Description</label>
+    <textarea id="description" formControlName="description" rows="3" placeholder="Optional details"></textarea>
+    @if (descriptionControl.touched && descriptionControl.invalid) {
+      <small class="field-error">Description must be 500 characters max.</small>
+    }
+
+    <button type="submit" [disabled]="submitting">
+      {{ submitting ? 'Creating...' : 'Create task' }}
+    </button>
+  </form>
+
+  @if (loading) {
+    <p class="info">Loading tasks...</p>
+  }
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (!loading && tasks.length === 0) {
+    <p class="info">No tasks yet. Create your first task.</p>
+  }
+
+  <ul class="task-list">
+    @for (task of tasks; track trackByTaskId($index, task)) {
+      <li [class.completed]="task.completed">
+        <div class="task-content">
+          <h3>{{ task.title }}</h3>
+          <p>{{ task.description || 'No description' }}</p>
+        </div>
+        <div class="task-actions">
+          <button type="button" [disabled]="isTaskUpdating(task.id)" (click)="toggleComplete(task)">
+            {{ isTaskUpdating(task.id) ? 'Updating...' : (task.completed ? 'Mark pending' : 'Mark done') }}
+          </button>
+          <button type="button" class="delete" [disabled]="isTaskUpdating(task.id)" (click)="deleteTask(task.id)">Delete</button>
+        </div>
+      </li>
+    }
+  </ul>
+</section>
